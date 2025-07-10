@@ -9,6 +9,8 @@ import authRouter from './routes/auth';
 import appointmentsRouter from './routes/appointments';
 import recordsRouter from './routes/records';
 import profileRouter from './routes/profile';
+import subscriptionRouter from './routes/subscription';
+import { stripeWebhookHandler } from './routes/stripeWebhook';
 import { moderateText } from './utils/moderation';
 
 // Initialize Prisma
@@ -27,6 +29,11 @@ const io = new SocketIOServer(httpServer, {
 
 // Basic middleware
 app.use(cors());
+
+// Stripe webhook must use raw body
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhookHandler);
+
+// JSON parser for rest routes
 app.use(express.json());
 
 // Routes
@@ -34,6 +41,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/appointments', appointmentsRouter);
 app.use('/api/records', recordsRouter);
 app.use('/api/profile', profileRouter);
+app.use('/api/subscription', subscriptionRouter);
 
 // Socket.io connection
 io.on('connection', (socket) => {

@@ -39,6 +39,8 @@ model DoctorProfile {
   specialty   String
   availability Json?
   subscriptionStatus String  @default("FREE")
+  stripeCustomerId   String? @unique
+  stripeSubscriptionId String?
   appointments Appointment[]
   messages     Message[]     @relation("DoctorMessages")
 }
