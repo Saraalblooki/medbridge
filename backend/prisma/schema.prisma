@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  DOCTOR
+  PATIENT
+}
+
+enum AppointmentStatus {
+  PENDING
+  ACCEPTED
+  COMPLETED
+  DECLINED
+}
+
+model User {
+  id        Int             @id @default(autoincrement())
+  email     String          @unique
+  password  String
+  role      Role
+  doctor    DoctorProfile?  @relation(fields: [doctorProfileId], references: [id])
+  patient   PatientProfile? @relation(fields: [patientProfileId], references: [id])
+  doctorProfileId  Int?
+  patientProfileId Int?
+  createdAt DateTime        @default(now())
+}
+
+model DoctorProfile {
+  id          Int          @id @default(autoincrement())
+  user        User         @relation(fields: [userId], references: [id])
+  userId      Int
+  name        String
+  specialty   String
+  availability Json?
+  subscriptionStatus String  @default("FREE")
+  appointments Appointment[]
+  messages     Message[]     @relation("DoctorMessages")
+}
+
+model PatientProfile {
+  id        Int          @id @default(autoincrement())
+  user      User         @relation(fields: [userId], references: [id])
+  userId    Int
+  name      String
+  dob       DateTime
+  contactInfo String
+  appointments Appointment[]
+  messages     Message[]     @relation("PatientMessages")
+}
+
+model Appointment {
+  id          Int            @id @default(autoincrement())
+  doctor      DoctorProfile  @relation(fields: [doctorId], references: [id])
+  doctorId    Int
+  patient     PatientProfile @relation(fields: [patientId], references: [id])
+  patientId   Int
+  datetime    DateTime
+  status      AppointmentStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+}
+
+model Message {
+  id         Int            @id @default(autoincrement())
+  doctor     DoctorProfile  @relation("DoctorMessages", fields: [doctorId], references: [id])
+  doctorId   Int
+  patient    PatientProfile @relation("PatientMessages", fields: [patientId], references: [id])
+  patientId  Int
+  content    String
+  createdAt  DateTime       @default(now())
+  flagged    Boolean        @default(false)
+}
