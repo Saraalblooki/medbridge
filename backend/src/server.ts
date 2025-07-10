@@ -7,6 +7,8 @@ import { PrismaClient } from '@prisma/client';
 
 import authRouter from './routes/auth';
 import appointmentsRouter from './routes/appointments';
+import recordsRouter from './routes/records';
+import profileRouter from './routes/profile';
 import { moderateText } from './utils/moderation';
 
 // Initialize Prisma
@@ -30,6 +32,8 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRouter);
 app.use('/api/appointments', appointmentsRouter);
+app.use('/api/records', recordsRouter);
+app.use('/api/profile', profileRouter);
 
 // Socket.io connection
 io.on('connection', (socket) => {
