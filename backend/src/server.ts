@@ -60,8 +60,8 @@ io.on('connection', (socket) => {
 
     const room = `room_${doctorId}_${patientId}`;
 
-    // Simple moderation
-    const { flagged } = moderateText(content);
+    // AI moderation (OpenAI + banned words)
+    const { flagged } = await moderateText(content);
 
     // Store message in DB
     try {
